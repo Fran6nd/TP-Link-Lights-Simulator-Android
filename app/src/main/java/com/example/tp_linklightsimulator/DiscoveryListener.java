@@ -12,6 +12,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 public class DiscoveryListener {
@@ -23,6 +24,7 @@ public class DiscoveryListener {
         try {
             DiscoveryListener.socket = new DatagramSocket(9999, InetAddress.getByName("0.0.0.0"));
             DiscoveryListener.socket.setBroadcast(true);
+            socket.setSoTimeout(10);
             Resources res = ctx.getResources();
             InputStream in_s = res.openRawResource(R.raw.lb100_status);
 
@@ -72,7 +74,11 @@ public class DiscoveryListener {
                 System.out.println(tplink.decrypt(packet.getData()));
                 socket.send(new DatagramPacket(tplink.encrypt(json_status),json_status.getBytes().length, packet.getAddress(), packet.getPort() ));
 
-            } catch (IOException e) {
+            }
+            catch (SocketTimeoutException exception) {
+                // Normal.
+            }
+            catch (IOException e) {
                 e.printStackTrace();
             }
         }
