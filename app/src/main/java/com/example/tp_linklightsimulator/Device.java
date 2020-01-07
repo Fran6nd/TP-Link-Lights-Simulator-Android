@@ -16,6 +16,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.UUID;
 
 public class Device {
     public boolean running = true;
@@ -24,8 +25,10 @@ public class Device {
     public static  String json_status;
     public static String name;
     public  static int state = 1;
+    public static String deviceId;
     public static boolean init(Context ctx, String name) {
         Device.name = name;
+        deviceId = generateString();
         try {
             Device.socket = new DatagramSocket(9999, InetAddress.getByName("0.0.0.0"));
             Device.socket.setBroadcast(true);
@@ -54,7 +57,6 @@ public class Device {
     }
     public static void run()
     {
-        Log.d("goog", "now listening...");
         listener  = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -72,8 +74,12 @@ public class Device {
             e.printStackTrace();
         }
     }
+    public static String generateString() {
+        String uuid = UUID.randomUUID().toString();
+        return uuid;
+    }
     public static void sendInfos(DatagramPacket packet) throws IOException {
-        byte[] msg = tplink.encrypt(String.format(json_status, Device.name, Device.state));
+        byte[] msg = tplink.encrypt(String.format(json_status,Device.deviceId, Device.name, Device.state));
 
             socket.send(new DatagramPacket(msg,msg.length, packet.getAddress(), packet.getPort() ));
 
