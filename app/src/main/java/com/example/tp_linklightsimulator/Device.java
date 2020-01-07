@@ -3,6 +3,7 @@ package com.example.tp_linklightsimulator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
+import android.widget.ImageView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,9 +27,11 @@ public class Device {
     public static String name;
     public  static int state = 1;
     public static String deviceId;
-    public static boolean init(Context ctx, String name) {
+    public static ImageView view;
+    public static boolean init(Context ctx, String name, ImageView lamp) {
         Device.name = name;
         deviceId = generateString();
+        view = lamp;
         try {
             Device.socket = new DatagramSocket(9999, InetAddress.getByName("0.0.0.0"));
             Device.socket.setBroadcast(true);
@@ -40,6 +43,7 @@ public class Device {
             in_s.read(b);
             json_status = new String((b));
             System.out.println(json_status);
+            view.setImageResource(R.drawable.light_on);
             return true;
         } catch (SocketException e) {
             e.printStackTrace();
@@ -103,6 +107,12 @@ public class Device {
                 else if (instruct.has("set_relay_state"))
                 {
                     Device.state = instruct.getJSONObject("set_relay_state").getInt("state");
+                    if(Device.state == 1){
+                        view.setImageResource(R.drawable.light_on);
+                    }
+                    else{
+                        view.setImageResource(R.drawable.light_off);
+                    }
                 }
                 String instruction;
                 System.out.println(json);
