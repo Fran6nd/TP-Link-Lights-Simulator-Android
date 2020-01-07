@@ -1,38 +1,25 @@
 package com.example.tp_linklightsimulator;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import androidx.appcompat.app.AppCompatActivity;
 
 
 public class MainActivity extends AppCompatActivity {
     public boolean running = true;
     public Thread dl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        DiscoveryListener.init(this, "gogo441");
-        System.out.println("started");
-        Log.d("fdsf", "gfdfg");
+        Device.init(this, "gogo441");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final Button button = findViewById(R.id.start_stop);
@@ -41,14 +28,11 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("started");
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Log.d("fdfdf", "ggfdgfg");
-                if(button.getText() == "START")
-                {
-                    DiscoveryListener.run();
-                    DiscoveryListener.setName(inputName.getText().toString());
-                }
-                else{
-                    DiscoveryListener.stop();
+                if (button.getText() == "START") {
+                    Device.run();
+                    Device.setName(inputName.getText().toString());
+                } else {
+                    Device.stop();
                 }
                 button.setText(button.getText() == "START" ? "STOP" : "START");
             }
@@ -57,11 +41,10 @@ public class MainActivity extends AppCompatActivity {
 
             public void onTextChanged(CharSequence s, int start, int before,
                                       int count) {
-                if(!s.equals("") ) {
-                    DiscoveryListener.setName(inputName.getText().toString());
+                if (!s.equals("")) {
+                    Device.setName(inputName.getText().toString());
                 }
             }
-
 
 
             public void beforeTextChanged(CharSequence s, int start, int count,
@@ -71,11 +54,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void afterTextChanged(Editable s) {
-                DiscoveryListener.setName(inputName.getText().toString());
+                Device.setName(inputName.getText().toString());
 
             }
         });
     }
+
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
@@ -86,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     // Event Handling for individual deviceSelector
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        switch(menuItem.getItemId()) {
+        switch (menuItem.getItemId()) {
             case R.id.menu_settings:
                 Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT).show();
                 return true;

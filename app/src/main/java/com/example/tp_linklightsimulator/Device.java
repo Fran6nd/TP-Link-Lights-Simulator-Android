@@ -3,9 +3,10 @@ package com.example.tp_linklightsimulator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.io.Console;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
@@ -16,17 +17,18 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 
-public class DiscoveryListener {
+public class Device {
     public boolean running = true;
     public static DatagramSocket socket = null;
     public static  Thread listener;
     public static  String json_status;
     public static String name;
+    public  static int state = 1;
     public static boolean init(Context ctx, String name) {
-        DiscoveryListener.name = name;
+        Device.name = name;
         try {
-            DiscoveryListener.socket = new DatagramSocket(9999, InetAddress.getByName("0.0.0.0"));
-            DiscoveryListener.socket.setBroadcast(true);
+            Device.socket = new DatagramSocket(9999, InetAddress.getByName("0.0.0.0"));
+            Device.socket.setBroadcast(true);
             socket.setSoTimeout(10);
             Resources res = ctx.getResources();
             InputStream in_s = res.openRawResource(R.raw.lb100_status);
@@ -48,7 +50,7 @@ public class DiscoveryListener {
     }
     public static void setName(String name)
     {
-        DiscoveryListener.name = name;
+        Device.name = name;
     }
     public static void run()
     {
@@ -70,6 +72,12 @@ public class DiscoveryListener {
             e.printStackTrace();
         }
     }
+    public static void sendInfos(DatagramPacket packet) throws IOException {
+        byte[] msg = tplink.encrypt(String.format(json_status, Device.name, Device.state));
+
+            socket.send(new DatagramPacket(msg,msg.length, packet.getAddress(), packet.getPort() ));
+
+    }
     public static void loop(){
         System.out.println("Now listening");
         while(!Thread.currentThread().isInterrupted())
@@ -79,16 +87,29 @@ public class DiscoveryListener {
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
             try {
                 socket.receive(packet);
+                String json = tplink.decrypt(packet.getData());
+                JSONObject obj = new JSONObject(json);
+                JSONObject instruct = obj.getJSONObject("system");
+                if(instruct.has("get_sysinfo"))
+                {
+                    System.out.println("Get infos");
+                }
+                else if (instruct.has("set_relay_state"))
+                {
+                    Device.state = instruct.getJSONObject("set_relay_state").getInt("state");
+                }
+                String instruction;
+                System.out.println(json);
+                Device.sendInfos(packet);
 
-                System.out.println(tplink.decrypt(packet.getData()));
-                byte[] msg = tplink.encrypt(String.format(json_status, DiscoveryListener.name));
-                socket.send(new DatagramPacket(msg,msg.length, packet.getAddress(), packet.getPort() ));
 
             }
             catch (SocketTimeoutException exception) {
                 // Normal.
             }
             catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
