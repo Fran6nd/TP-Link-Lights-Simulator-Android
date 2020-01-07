@@ -14,13 +14,16 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 public class DiscoveryListener {
     public boolean running = true;
     public static DatagramSocket socket = null;
     public static  Thread listener;
     public static  String json_status;
-    public static boolean init(Context ctx) {
+    public static String name;
+    public static boolean init(Context ctx, String name) {
+        DiscoveryListener.name = name;
         try {
             DiscoveryListener.socket = new DatagramSocket(9999, InetAddress.getByName("0.0.0.0"));
             DiscoveryListener.socket.setBroadcast(true);
@@ -42,6 +45,10 @@ public class DiscoveryListener {
         }
         return false;
 
+    }
+    public static void setName(String name)
+    {
+        DiscoveryListener.name = name;
     }
     public static void run()
     {
@@ -68,11 +75,14 @@ public class DiscoveryListener {
         while(!Thread.currentThread().isInterrupted())
         {
             byte[] buf = new byte[512];
+            Arrays.fill( buf, (byte) 0 );
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
             try {
                 socket.receive(packet);
+
                 System.out.println(tplink.decrypt(packet.getData()));
-                socket.send(new DatagramPacket(tplink.encrypt(json_status),json_status.getBytes().length, packet.getAddress(), packet.getPort() ));
+                byte[] msg = tplink.encrypt(String.format(json_status, DiscoveryListener.name));
+                socket.send(new DatagramPacket(msg,msg.length, packet.getAddress(), packet.getPort() ));
 
             }
             catch (SocketTimeoutException exception) {

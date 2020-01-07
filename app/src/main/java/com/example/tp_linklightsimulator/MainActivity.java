@@ -4,11 +4,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -24,13 +30,13 @@ public class MainActivity extends AppCompatActivity {
     public Thread dl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        DiscoveryListener.init(this);
+        DiscoveryListener.init(this, "gogo441");
         System.out.println("started");
         Log.d("fdsf", "gfdfg");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final Button button = findViewById(R.id.start_stop);
-        final Button button_menu = findViewById(R.id.button);
+        final EditText inputName = findViewById(R.id.deviceName);
         button.setText("START");
         System.out.println("started");
         button.setOnClickListener(new View.OnClickListener() {
@@ -39,11 +45,34 @@ public class MainActivity extends AppCompatActivity {
                 if(button.getText() == "START")
                 {
                     DiscoveryListener.run();
+                    DiscoveryListener.setName(inputName.getText().toString());
                 }
                 else{
                     DiscoveryListener.stop();
                 }
                 button.setText(button.getText() == "START" ? "STOP" : "START");
+            }
+        });
+        inputName.addTextChangedListener(new TextWatcher() {
+
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {
+                if(!s.equals("") ) {
+                    DiscoveryListener.setName(inputName.getText().toString());
+                }
+            }
+
+
+
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+
+
+            }
+
+            public void afterTextChanged(Editable s) {
+                DiscoveryListener.setName(inputName.getText().toString());
+
             }
         });
     }

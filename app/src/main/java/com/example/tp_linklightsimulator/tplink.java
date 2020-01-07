@@ -12,7 +12,7 @@ public class tplink {
             input[i] = (byte) (input[i] ^ key);
             key = nextKey;
         }
-        return new String(input);
+        return new String(input).trim();
     }
     public static byte[] encrypt(String input) {
         byte[] byteInput = input.getBytes();
@@ -21,7 +21,7 @@ public class tplink {
         for(int i = 0; i < byteInput.length; i++)
         {
             byteInput[i] = (byte) (byteInput[i] ^ key);
-            key = key = byteInput[i];
+            key = byteInput[i];
         }
         return byteInput;
     }
