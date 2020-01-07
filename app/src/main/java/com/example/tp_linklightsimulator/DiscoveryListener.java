@@ -14,13 +14,11 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import static androidx.core.graphics.drawable.IconCompat.getResources;
-
 public class DiscoveryListener {
     public boolean running = true;
     public static DatagramSocket socket = null;
     public static  Thread listener;
-    public static  String json_status = R.raw.lb100_status
+    public static  String json_status;
     public static boolean init(Context ctx) {
         try {
             DiscoveryListener.socket = new DatagramSocket(9999, InetAddress.getByName("0.0.0.0"));
@@ -31,6 +29,7 @@ public class DiscoveryListener {
             byte[] b = new byte[in_s.available()];
             in_s.read(b);
             json_status = new String((b));
+            System.out.println(json_status);
             return true;
         } catch (SocketException e) {
             e.printStackTrace();
@@ -42,8 +41,9 @@ public class DiscoveryListener {
         return false;
 
     }
-    public void run()
+    public static void run()
     {
+        Log.d("goog", "now listening...");
         listener  = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -51,6 +51,7 @@ public class DiscoveryListener {
 
             }
         });
+        listener.start();
     }
     public static void stop(){
         try {

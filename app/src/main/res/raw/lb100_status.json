@@ -1,0 +1,32 @@
+{
+  "system":{
+    "get_sysinfo":{
+      "err_code":0,
+      "sw_ver":"1.0.8 Build 151101 Rel.24452",
+      "hw_ver":"1.0",
+      "type":"smartbulb",
+      "model":"LB100(EU)",
+      "mac":"50:C7:BF:00:C4:D0",
+      "deviceId":"8006BE9B2C1A6114DBFA0632B02D566D170BC38A",
+      "hwId":"22603EA5E716DEAEA6642A30BE87AFCA",
+      "fwId":"BFF24826FBC561803E49379DBE74FD71",
+      "oemId":"812A90EB2FCF306A993FAD8748024B07",
+      "alias":"mio",
+      "dev_name":"Wi-Fi Smart Plug",
+      "icon_hash":"",
+      "relay_state":0,
+      "on_time":0,
+      "active_mode":"schedule",
+      "feature":"TIM",
+      "updating":0,
+      "rssi":-52,
+      "led_off":0,
+      "latitude":0,
+      "longitude":0
+    }
+  },
+  "emeter":{
+    "err_code":-1,
+    "err_msg":"module not support"
+  }
+}
