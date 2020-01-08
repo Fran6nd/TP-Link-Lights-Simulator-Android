@@ -134,14 +134,19 @@ public class Device {
     public static void set_state(int state) {
         deviceId = generateString();
         Device.state = state;
-        float hsv[] = {hue, saturation, brightness};
+        float hsv[] = {(float)hue, ((float)saturation)/256,((float) brightness)/256};
+        /*
+        * hue 0-360
+        * saturation 0-1 per default
+        * brightness 0-1 per default*/
         int color =  Color.HSVToColor(hsv);
         int ORANGE = 0xFFFFBF00;
         final Bitmap back = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_off).copy(Bitmap.Config.ARGB_8888, true);
         // Decoding the image two resource into a Bitmap
         Bitmap imageTwo = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_contour);
         if (state == 1) {
-            imageTwo = setColor(imageTwo, (color & 0x00FFFFFF ) | (((byte)brightness)<<8*3));
+            //imageTwo = setColor(imageTwo, (color & 0x00FFFFFF ) | (((byte)brightness)<<8*3));
+            imageTwo = setColor(imageTwo, color);
 
         } else {
             imageTwo = setColor(imageTwo, Color.WHITE);
@@ -231,7 +236,7 @@ public class Device {
                         JSONObject instruct = obj.getJSONObject("smartlife.iot.smartbulb.lightingservice").getJSONObject("transition_light_state");
                         if(instruct.has("brightness"))
                         {
-                            setBrightness(instruct.getInt("brightness"));
+                            brightness = (instruct.getInt("brightness")) ;
                         }
                         if(instruct.has("saturation"))
                         {
@@ -243,8 +248,8 @@ public class Device {
                         }
 
                         set_state(instruct.getInt("on_off"));
-                        String str =" {\"smartlife.iot.smartbulb.lightingservice\":{\"transition_light_state\":{\"on_off\":%d,\"mode\":\"normal\",\"hue\":120,\"saturation\":65,\"color_temp\":0,\"brightness\":%d,\"err_code\":0}}} " ;
-                        str = String.format(str, state, brightness);
+                        String str =" {\"smartlife.iot.smartbulb.lightingservice\":{\"transition_light_state\":{\"on_off\":%d,\"mode\":\"normal\",\"hue\":%d,\"saturation\":%d,\"color_temp\":0,\"brightness\":%d,\"err_code\":0}}} " ;
+                        str = String.format(str, state, hue, saturation, brightness);
                         sendString(packet, str);
 
                     }
