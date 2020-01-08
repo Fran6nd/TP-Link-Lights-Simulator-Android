@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,9 +43,9 @@ public class Device {
     public static int state = 1;
     public static String deviceId;
     public static ImageView view;
-    public static Context ctx;
+    public static AppCompatActivity ctx;
 
-    public static boolean init(Context ctx, String name, ImageView lamp) {
+    public static boolean init(AppCompatActivity ctx, String name, ImageView lamp) {
         Device.name = name;
 
         view = lamp;
@@ -104,7 +106,7 @@ public class Device {
 
     public static String generateString() {
         String deviceId = "";
-        WifiManager manager = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);
+        WifiManager manager = (WifiManager) ((Context)ctx).getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = manager.getConnectionInfo();
         return info.getMacAddress();
         }
@@ -119,10 +121,21 @@ public class Device {
         deviceId = generateString();
         Device.state = state;
         if(Device.state == 1){
-            view.setImageResource(R.drawable.light_on);
+            ctx.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    view.setImageResource(R.drawable.light_on);
+                }
+            });
+
         }
         else{
-            view.setImageResource(R.drawable.light_off);
+            ctx.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    view.setImageResource(R.drawable.light_off);
+                }
+            });
         }
     }
     public static void loop(){

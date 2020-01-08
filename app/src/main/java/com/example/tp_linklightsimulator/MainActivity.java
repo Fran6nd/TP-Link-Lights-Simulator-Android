@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
                     Device.run();
                     Device.setName(inputName.getText().toString());
                 } else {
+
                     Device.stop();
                 }
                 button.setText(button.getText() == "START" ? "STOP" : "START");
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         menuInflater.inflate(R.menu.deviceselector, menu);
         return true;
     }
+
 
     // Event Handling for individual deviceSelector
     @Override
