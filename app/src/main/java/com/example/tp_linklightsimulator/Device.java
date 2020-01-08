@@ -2,6 +2,11 @@ package com.example.tp_linklightsimulator;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.view.View;
@@ -113,7 +118,8 @@ public class Device {
             ctx.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    view.setImageResource(R.drawable.light_on);
+                    //view.setImageResource(R.drawable.light_on);
+                    updateButtonView();
                 }
             });
 
@@ -125,6 +131,38 @@ public class Device {
                 }
             });
         }
+    }
+    public static Bitmap replaceColor(Bitmap src,int fromColor, int targetColor) {
+        if(src == null) {
+            return null;
+        }
+        // Source image size
+        int width = src.getWidth();
+        int height = src.getHeight();
+        int[] pixels = new int[width * height];
+        //get pixels
+        src.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        for(int x = 0; x < pixels.length; ++x) {
+            pixels[x] = (pixels[x] == fromColor) ? targetColor : pixels[x];
+        }
+        // create result bitmap output
+        Bitmap result = Bitmap.createBitmap(width, height, src.getConfig());
+        //set pixels
+        result.setPixels(pixels, 0, width, 0, 0, width, height);
+
+        return result;
+    }
+    public static void updateButtonView(){
+        Bitmap back = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_off).copy(Bitmap.Config.ARGB_8888,true);
+        // Decoding the image two resource into a Bitmap
+        Bitmap imageTwo= BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_contour);
+        imageTwo = replaceColor(imageTwo, Color.WHITE, Color.RED);
+        // Here we construct the canvas with the specified bitmap to draw onto
+        Canvas canvas=new Canvas(back);
+        canvas.drawBitmap(imageTwo,0,0,new Paint());
+
+        view.setImageBitmap(back);
     }
 
     public static void loop() {
