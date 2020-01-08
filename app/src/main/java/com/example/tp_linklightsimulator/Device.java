@@ -1,7 +1,15 @@
 package com.example.tp_linklightsimulator;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -20,26 +28,33 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.UUID;
 
+import static android.content.Context.TELEPHONY_SERVICE;
+import static androidx.core.content.ContextCompat.getSystemService;
+import static androidx.core.content.PermissionChecker.checkSelfPermission;
+
 public class Device {
     public boolean running = true;
     public static DatagramSocket socket = null;
-    public static  Thread listener;
-    public static  String json_status;
+    public static Thread listener;
+    public static String json_status;
     public static String name;
-    public  static int state = 1;
+    public static int state = 1;
     public static String deviceId;
     public static ImageView view;
+    public static Context ctx;
+
     public static boolean init(Context ctx, String name, ImageView lamp) {
         Device.name = name;
-        deviceId = generateString();
+
         view = lamp;
+        Device.ctx = ctx;
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               Device.set_state(state == 1 ? 0 : 1);
+                Device.set_state(state == 1 ? 0 : 1);
             }
         });
-    try {
+        try {
             Device.socket = new DatagramSocket(9999, InetAddress.getByName("0.0.0.0"));
             Device.socket.setBroadcast(true);
             socket.setSoTimeout(10);
@@ -62,22 +77,23 @@ public class Device {
         return false;
 
     }
-    public static void setName(String name)
-    {
+
+    public static void setName(String name) {
         Device.name = name;
     }
-    public static void run()
-    {
-        listener  = new Thread(new Runnable() {
+
+    public static void run() {
+        listener = new Thread(new Runnable() {
             @Override
             public void run() {
-                    loop();
+                loop();
 
             }
         });
         listener.start();
     }
-    public static void stop(){
+
+    public static void stop() {
         try {
             listener.interrupt();
             listener.join();
@@ -85,10 +101,13 @@ public class Device {
             e.printStackTrace();
         }
     }
+
     public static String generateString() {
-        String uuid = UUID.randomUUID().toString();
-        return uuid;
-    }
+        String deviceId = "";
+        WifiManager manager = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = manager.getConnectionInfo();
+        return info.getMacAddress();
+        }
     public static void sendInfos(DatagramPacket packet) throws IOException {
         byte[] msg = tplink.encrypt(String.format(json_status,Device.deviceId, Device.name, Device.state));
 
@@ -97,6 +116,7 @@ public class Device {
     }
     public static void set_state(int state)
     {
+        deviceId = generateString();
         Device.state = state;
         if(Device.state == 1){
             view.setImageResource(R.drawable.light_on);
@@ -123,13 +143,7 @@ public class Device {
                 }
                 else if (instruct.has("set_relay_state"))
                 {
-                    Device.state = instruct.getJSONObject("set_relay_state").getInt("state");
-                    if(Device.state == 1){
-                        view.setImageResource(R.drawable.light_on);
-                    }
-                    else{
-                        view.setImageResource(R.drawable.light_off);
-                    }
+                    set_state(instruct.getJSONObject("set_relay_state").getInt("state"));
                 }
                 String instruction;
                 System.out.println(json);
