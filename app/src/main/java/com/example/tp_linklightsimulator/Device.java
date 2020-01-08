@@ -1,16 +1,9 @@
 package com.example.tp_linklightsimulator;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
-import android.provider.Settings;
-import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -28,14 +21,8 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.UUID;
-
-import static android.content.Context.TELEPHONY_SERVICE;
-import static androidx.core.content.ContextCompat.getSystemService;
-import static androidx.core.content.PermissionChecker.checkSelfPermission;
 
 public class Device {
-    public boolean running = true;
     public static DatagramSocket socket = null;
     public static Thread listener;
     public static String json_status;
@@ -44,6 +31,7 @@ public class Device {
     public static String deviceId;
     public static ImageView view;
     public static AppCompatActivity ctx;
+    public boolean running = true;
 
     public static boolean init(AppCompatActivity ctx, String name, ImageView lamp) {
         Device.name = name;
@@ -106,21 +94,22 @@ public class Device {
 
     public static String generateString() {
         String deviceId = "";
-        WifiManager manager = (WifiManager) ((Context)ctx).getSystemService(Context.WIFI_SERVICE);
+        WifiManager manager = (WifiManager) ((Context) ctx).getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = manager.getConnectionInfo();
         return info.getMacAddress();
-        }
-    public static void sendInfos(DatagramPacket packet) throws IOException {
-        byte[] msg = tplink.encrypt(String.format(json_status,Device.deviceId, Device.name, Device.state));
+    }
 
-            socket.send(new DatagramPacket(msg,msg.length, packet.getAddress(), packet.getPort() ));
+    public static void sendInfos(DatagramPacket packet) throws IOException {
+        byte[] msg = tplink.encrypt(String.format(json_status, Device.deviceId, Device.name, Device.state));
+
+        socket.send(new DatagramPacket(msg, msg.length, packet.getAddress(), packet.getPort()));
 
     }
-    public static void set_state(int state)
-    {
+
+    public static void set_state(int state) {
         deviceId = generateString();
         Device.state = state;
-        if(Device.state == 1){
+        if (Device.state == 1) {
             ctx.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -128,8 +117,7 @@ public class Device {
                 }
             });
 
-        }
-        else{
+        } else {
             ctx.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -138,24 +126,21 @@ public class Device {
             });
         }
     }
-    public static void loop(){
+
+    public static void loop() {
         System.out.println("Now listening");
-        while(!Thread.currentThread().isInterrupted())
-        {
+        while (!Thread.currentThread().isInterrupted()) {
             byte[] buf = new byte[512];
-            Arrays.fill( buf, (byte) 0 );
+            Arrays.fill(buf, (byte) 0);
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
             try {
                 socket.receive(packet);
                 String json = tplink.decrypt(packet.getData());
                 JSONObject obj = new JSONObject(json);
                 JSONObject instruct = obj.getJSONObject("system");
-                if(instruct.has("get_sysinfo"))
-                {
+                if (instruct.has("get_sysinfo")) {
                     System.out.println("Get infos");
-                }
-                else if (instruct.has("set_relay_state"))
-                {
+                } else if (instruct.has("set_relay_state")) {
                     set_state(instruct.getJSONObject("set_relay_state").getInt("state"));
                 }
                 String instruction;
@@ -163,11 +148,9 @@ public class Device {
                 Device.sendInfos(packet);
 
 
-            }
-            catch (SocketTimeoutException exception) {
+            } catch (SocketTimeoutException exception) {
                 // Normal.
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
