@@ -26,7 +26,17 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-
+/*
+*
+*API: https://www.briandorey.com/post/tp-link-lb130-smart-wi-fi-led-bulb-python-control
+*
+*
+*
+*
+*
+*
+*
+* */
 public class Device {
     public static DatagramSocket socket = null;
     public static Thread listener;
@@ -38,6 +48,8 @@ public class Device {
     public static AppCompatActivity ctx;
     public boolean running = true;
     public static int brightness = 255;
+    public static int hue = 50;
+    public static int saturation = 50;
 
     public static boolean init(AppCompatActivity ctx, String name, ImageView lamp) {
         Device.name = name;
@@ -122,14 +134,14 @@ public class Device {
     public static void set_state(int state) {
         deviceId = generateString();
         Device.state = state;
-
+        float hsv[] = {hue, saturation, brightness};
+        int color =  Color.HSVToColor(hsv);
         int ORANGE = 0xFFFFBF00;
         final Bitmap back = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_off).copy(Bitmap.Config.ARGB_8888, true);
         // Decoding the image two resource into a Bitmap
         Bitmap imageTwo = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_contour);
         if (state == 1) {
-            imageTwo = setColor(imageTwo, (ORANGE & 0x00FFFFFF ) | (((byte)brightness)<<8*3));
-            System.out.println(String.format("0x%08X", (((byte)0xFA<<8*3))));
+            imageTwo = setColor(imageTwo, (color & 0x00FFFFFF ) | (((byte)brightness)<<8*3));
 
         } else {
             imageTwo = setColor(imageTwo, Color.WHITE);
@@ -221,9 +233,18 @@ public class Device {
                         {
                             setBrightness(instruct.getInt("brightness"));
                         }
+                        if(instruct.has("saturation"))
+                        {
+                            saturation = (instruct.getInt("saturation"));
+                        }
+                        if(instruct.has("hue"))
+                        {
+                            hue  = (instruct.getInt("hue"));
+                        }
 
                         set_state(instruct.getInt("on_off"));
-                        String str =" {\"smartlife.iot.smartbulb.lightingservice\":{\"transition_light_state\":{\"on_off\":1,\"mode\":\"normal\",\"hue\":120,\"saturation\":65,\"color_temp\":0,\"brightness\":10,\"err_code\":0}}} " ;
+                        String str =" {\"smartlife.iot.smartbulb.lightingservice\":{\"transition_light_state\":{\"on_off\":%d,\"mode\":\"normal\",\"hue\":120,\"saturation\":65,\"color_temp\":0,\"brightness\":%d,\"err_code\":0}}} " ;
+                        str = String.format(str, state, brightness);
                         sendString(packet, str);
 
                     }

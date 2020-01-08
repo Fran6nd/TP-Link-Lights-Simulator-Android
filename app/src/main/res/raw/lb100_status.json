@@ -16,7 +16,6 @@
   "is_variable_color_temp": 1,
   "light_state": {"brightness": 40,
     "color_temp": 2700,
-    "transition_light_state": 0,
     "hue": 0,
     "mode": "normal",
     "on_off": %d,
