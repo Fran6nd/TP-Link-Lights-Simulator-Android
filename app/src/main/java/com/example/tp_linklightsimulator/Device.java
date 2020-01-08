@@ -60,7 +60,7 @@ public class Device {
             in_s.read(b);
             json_status = new String((b));
             System.out.println(json_status);
-            view.setImageResource(R.drawable.light_on);
+            updateButtonView();
             return true;
         } catch (SocketException e) {
             e.printStackTrace();
@@ -114,26 +114,17 @@ public class Device {
     public static void set_state(int state) {
         deviceId = generateString();
         Device.state = state;
-        if (Device.state == 1) {
-            ctx.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    //view.setImageResource(R.drawable.light_on);
-                    updateButtonView();
-                }
-            });
 
-        } else {
-            ctx.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    view.setImageResource(R.drawable.light_off);
-                }
-            });
-        }
+        ctx.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                updateButtonView();
+            }
+        });
     }
-    public static Bitmap replaceColor(Bitmap src,int fromColor, int targetColor) {
-        if(src == null) {
+
+    public static Bitmap replaceColor(Bitmap src, int fromColor, int targetColor) {
+        if (src == null) {
             return null;
         }
         // Source image size
@@ -143,7 +134,7 @@ public class Device {
         //get pixels
         src.getPixels(pixels, 0, width, 0, 0, width, height);
 
-        for(int x = 0; x < pixels.length; ++x) {
+        for (int x = 0; x < pixels.length; ++x) {
             pixels[x] = (pixels[x] == fromColor) ? targetColor : pixels[x];
         }
         // create result bitmap output
@@ -153,14 +144,21 @@ public class Device {
 
         return result;
     }
-    public static void updateButtonView(){
-        Bitmap back = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_off).copy(Bitmap.Config.ARGB_8888,true);
+
+    public static void updateButtonView() {
+        int ORANGE = 0xFFFFBF00;
+        Bitmap back = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_off).copy(Bitmap.Config.ARGB_8888, true);
         // Decoding the image two resource into a Bitmap
-        Bitmap imageTwo= BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_contour);
-        imageTwo = replaceColor(imageTwo, Color.WHITE, Color.RED);
+        Bitmap imageTwo = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_contour);
+        if (state == 1) {
+            imageTwo = replaceColor(imageTwo, Color.WHITE, ORANGE);
+        } else {
+            imageTwo = replaceColor(imageTwo, ORANGE, Color.WHITE);
+        }
+
         // Here we construct the canvas with the specified bitmap to draw onto
-        Canvas canvas=new Canvas(back);
-        canvas.drawBitmap(imageTwo,0,0,new Paint());
+        Canvas canvas = new Canvas(back);
+        canvas.drawBitmap(imageTwo, 0, 0, new Paint());
 
         view.setImageBitmap(back);
     }
