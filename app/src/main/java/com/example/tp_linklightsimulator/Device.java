@@ -3,6 +3,7 @@ package com.example.tp_linklightsimulator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import org.json.JSONException;
@@ -32,7 +33,13 @@ public class Device {
         Device.name = name;
         deviceId = generateString();
         view = lamp;
-        try {
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               Device.set_state(state == 1 ? 0 : 1);
+            }
+        });
+    try {
             Device.socket = new DatagramSocket(9999, InetAddress.getByName("0.0.0.0"));
             Device.socket.setBroadcast(true);
             socket.setSoTimeout(10);
@@ -87,6 +94,16 @@ public class Device {
 
             socket.send(new DatagramPacket(msg,msg.length, packet.getAddress(), packet.getPort() ));
 
+    }
+    public static void set_state(int state)
+    {
+        Device.state = state;
+        if(Device.state == 1){
+            view.setImageResource(R.drawable.light_on);
+        }
+        else{
+            view.setImageResource(R.drawable.light_off);
+        }
     }
     public static void loop(){
         System.out.println("Now listening");
