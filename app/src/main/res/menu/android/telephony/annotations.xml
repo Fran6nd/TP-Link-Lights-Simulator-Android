@@ -1,5 +1,5 @@
 <root>
-    <item name='android.telephony.TelephonyManager'>
-        <annotation name='java.lang.Deprecated' />
+    <item name="android.telephony.TelephonyManager">
+        <annotation name="java.lang.Deprecated" />
     </item>
 </root>
