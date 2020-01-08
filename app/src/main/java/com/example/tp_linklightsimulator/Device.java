@@ -60,7 +60,7 @@ public class Device {
             in_s.read(b);
             json_status = new String((b));
             System.out.println(json_status);
-            updateButtonView();
+            set_state(0);
             return true;
         } catch (SocketException e) {
             e.printStackTrace();
@@ -115,12 +115,26 @@ public class Device {
         deviceId = generateString();
         Device.state = state;
 
+        int ORANGE = 0xFFFFBF00;
+        final Bitmap back = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_off).copy(Bitmap.Config.ARGB_8888, true);
+        // Decoding the image two resource into a Bitmap
+        Bitmap imageTwo = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_contour);
+        if (state == 1) {
+            imageTwo = replaceColor(imageTwo, Color.WHITE, ORANGE);
+        } else {
+            imageTwo = replaceColor(imageTwo, ORANGE, Color.WHITE);
+        }
+
+        // Here we construct the canvas with the specified bitmap to draw onto
+        Canvas canvas = new Canvas(back);
+        canvas.drawBitmap(imageTwo, 0, 0, new Paint());
         ctx.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                updateButtonView();
+                view.setImageBitmap(back);
             }
         });
+
     }
 
     public static Bitmap replaceColor(Bitmap src, int fromColor, int targetColor) {
@@ -145,23 +159,6 @@ public class Device {
         return result;
     }
 
-    public static void updateButtonView() {
-        int ORANGE = 0xFFFFBF00;
-        Bitmap back = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_off).copy(Bitmap.Config.ARGB_8888, true);
-        // Decoding the image two resource into a Bitmap
-        Bitmap imageTwo = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_contour);
-        if (state == 1) {
-            imageTwo = replaceColor(imageTwo, Color.WHITE, ORANGE);
-        } else {
-            imageTwo = replaceColor(imageTwo, ORANGE, Color.WHITE);
-        }
-
-        // Here we construct the canvas with the specified bitmap to draw onto
-        Canvas canvas = new Canvas(back);
-        canvas.drawBitmap(imageTwo, 0, 0, new Paint());
-
-        view.setImageBitmap(back);
-    }
 
     public static void loop() {
         System.out.println("Now listening");
