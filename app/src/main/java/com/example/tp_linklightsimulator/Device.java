@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -128,6 +129,12 @@ public class Device {
     }
 
     public static void set_state(int state) {
+        final SeekBar hueS = ctx.findViewById(R.id.sliderHue);
+        final SeekBar satS= ctx.findViewById(R.id.sliderSat);
+        final SeekBar brightS = ctx.findViewById(R.id.sliderBright);
+        hueS.setProgress(hue);
+        satS.setProgress(saturation);
+        brightS.setProgress(brightness);
         deviceId = generateString();
         Device.state = state;
         float hsv[] = {(float)hue, ((float)saturation)/100,((float) brightness)/256};
@@ -158,6 +165,10 @@ public class Device {
             }
         });
 
+    }
+    public static void update()
+    {
+        set_state(Device.state);
     }
     public static void setBrightness(int b){
         Device.brightness = b;
