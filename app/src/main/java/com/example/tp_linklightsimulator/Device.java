@@ -130,7 +130,7 @@ public class Device {
     public static void set_state(int state) {
         deviceId = generateString();
         Device.state = state;
-        float hsv[] = {(float)hue, ((float)saturation)/256,((float) brightness)/256};
+        float hsv[] = {(float)hue, ((float)saturation)/100,((float) brightness)/256};
         /*
         * hue 0-360
         * saturation 0-1 per default

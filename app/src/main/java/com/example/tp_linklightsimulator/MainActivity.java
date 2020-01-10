@@ -3,9 +3,7 @@ package com.example.tp_linklightsimulator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(final View v) {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-                builder.setTitle("Title");
+                builder.setTitle("Device's name:");
 
 // Set up the input
                 final EditText input = new EditText(ctx);
