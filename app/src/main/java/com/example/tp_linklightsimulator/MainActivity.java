@@ -1,7 +1,10 @@
 package com.example.tp_linklightsimulator;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -9,8 +12,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 
@@ -26,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         final ImageView lamp = findViewById(R.id.imageView);
         Device.init(this, "gogo441", lamp);
         final Button button = findViewById(R.id.start_stop);
-        final EditText inputName = findViewById(R.id.deviceName);
+        final TextView inputName = findViewById(R.id.deviceName);
         button.setText("STOP");
         Device.run();
         Device.setName(inputName.getText().toString());
@@ -43,25 +48,37 @@ public class MainActivity extends AppCompatActivity {
                 button.setText(button.getText() == "START" ? "STOP" : "START");
             }
         });
-        inputName.addTextChangedListener(new TextWatcher() {
+        final Context ctx = this;
+        inputName.setOnClickListener(new View.OnClickListener() {
 
-            public void onTextChanged(CharSequence s, int start, int before,
-                                      int count) {
-                if (!s.equals("")) {
-                    Device.setName(inputName.getText().toString());
-                }
-            }
+            @Override
+            public void onClick(final View v) {
 
+                AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+                builder.setTitle("Title");
 
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
+// Set up the input
+                final EditText input = new EditText(ctx);
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
 
+// Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Device.name = input.getText().toString();
+                        inputName.setText(input.getText().toString());
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
 
-            }
-
-            public void afterTextChanged(Editable s) {
-                Device.setName(inputName.getText().toString());
-
+                builder.show();
             }
         });
     }

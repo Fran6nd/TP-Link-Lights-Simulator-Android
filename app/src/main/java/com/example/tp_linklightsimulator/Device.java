@@ -143,14 +143,14 @@ public class Device {
         if (state == 1) {
             //imageTwo = setColor(imageTwo, (color & 0x00FFFFFF ) | (((byte)brightness)<<8*3));
             imageTwo = setColor(imageTwo, color);
+            Canvas canvas = new Canvas(back);
+            canvas.drawBitmap(imageTwo, 0, 0, new Paint());
 
         } else {
-            imageTwo = setColor(imageTwo, Color.WHITE);
         }
 
         // Here we construct the canvas with the specified bitmap to draw onto
-        Canvas canvas = new Canvas(back);
-        canvas.drawBitmap(imageTwo, 0, 0, new Paint());
+
         ctx.runOnUiThread(new Runnable() {
             @Override
             public void run() {
