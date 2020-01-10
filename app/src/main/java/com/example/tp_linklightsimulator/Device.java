@@ -59,7 +59,7 @@ public class Device {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Device.set_state(state == 1 ? 0 : 1);
+                Device.state = (state == 1 ? 0 : 1);
             }
         });
         try {
@@ -73,7 +73,7 @@ public class Device {
             in_s.read(b);
             json_status = new String((b));
             System.out.println(json_status);
-            set_state(0);
+            Device.state = (0);
             return true;
         } catch (SocketException e) {
             e.printStackTrace();
@@ -128,7 +128,8 @@ public class Device {
 
     }
 
-    public static void set_state(int state) {
+    public static void update()
+    {
         final SeekBar hueS = ctx.findViewById(R.id.sliderHue);
         final SeekBar satS= ctx.findViewById(R.id.sliderSat);
         final SeekBar brightS = ctx.findViewById(R.id.sliderBright);
@@ -139,9 +140,9 @@ public class Device {
         Device.state = state;
         float hsv[] = {(float)hue, ((float)saturation)/100,((float) brightness)/256};
         /*
-        * hue 0-360
-        * saturation 0-1 per default
-        * brightness 0-1 per default*/
+         * hue 0-360
+         * saturation 0-1 per default
+         * brightness 0-1 per default*/
         int color =  Color.HSVToColor(hsv);
         int ORANGE = 0xFFFFBF00;
         final Bitmap back = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.light_off).copy(Bitmap.Config.ARGB_8888, true);
@@ -164,11 +165,6 @@ public class Device {
                 view.setImageBitmap(back);
             }
         });
-
-    }
-    public static void update()
-    {
-        set_state(Device.state);
     }
     public static void setBrightness(int b){
         Device.brightness = b;
@@ -235,7 +231,7 @@ public class Device {
                     if (instruct.has("get_sysinfo")) {
                         Device.sendInfos(packet);
                     } else if (instruct.has("set_relay_state")) {
-                        set_state(instruct.getJSONObject("set_relay_state").getInt("state"));
+                        Device.state = (instruct.getJSONObject("set_relay_state").getInt("state"));
                         Device.sendInfos(packet);
                     }
                 }
@@ -255,7 +251,7 @@ public class Device {
                             hue  = (instruct.getInt("hue"));
                         }
 
-                        set_state(instruct.getInt("on_off"));
+                        Device.state = (instruct.getInt("on_off"));
                         String str =" {\"smartlife.iot.smartbulb.lightingservice\":{\"transition_light_state\":{\"on_off\":%d,\"mode\":\"normal\",\"hue\":%d,\"saturation\":%d,\"color_temp\":0,\"brightness\":%d,\"err_code\":0}}} " ;
                         str = String.format(str, state, hue, saturation, brightness);
                         sendString(packet, str);
@@ -273,6 +269,7 @@ public class Device {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            update();
         }
     }
 }
