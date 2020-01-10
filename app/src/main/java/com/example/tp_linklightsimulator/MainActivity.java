@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 Device.brightness = progress;
-                Device.update();
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -104,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 Device.saturation = progress;
-                Device.update();
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -121,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 Device.hue = progress;
-                Device.update();
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {
