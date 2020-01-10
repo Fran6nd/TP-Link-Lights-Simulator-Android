@@ -27,7 +27,9 @@ public class MainActivity extends AppCompatActivity {
         Device.init(this, "gogo441", lamp);
         final Button button = findViewById(R.id.start_stop);
         final EditText inputName = findViewById(R.id.deviceName);
-        button.setText("START");
+        button.setText("STOP");
+        Device.run();
+        Device.setName(inputName.getText().toString());
         System.out.println("started");
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

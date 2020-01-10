@@ -22,7 +22,7 @@
     "saturation": 0},
   "mic_mac": "50C7BFF87E61",
   "mic_type": "IOT.SMARTBULB",
-  "model": "LB120(EU)",
+  "model": "LB130(EU)",
   "oemId": "F6A0ACBBD7B8B723AE1E32C273ACB5CE",
   "preferred_state": [{"brightness": 100,
     "color_temp": 3500,

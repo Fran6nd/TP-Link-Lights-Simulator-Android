@@ -1,14 +1,12 @@
 package com.example.tp_linklightsimulator;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -26,17 +24,18 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+
 /*
-*
-*API: https://www.briandorey.com/post/tp-link-lb130-smart-wi-fi-led-bulb-python-control
-*
-*
-*
-*
-*
-*
-*
-* */
+ *
+ *API: https://www.briandorey.com/post/tp-link-lb130-smart-wi-fi-led-bulb-python-control
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * */
 public class Device {
     public static DatagramSocket socket = null;
     public static Thread listener;
@@ -67,7 +66,7 @@ public class Device {
             Device.socket.setBroadcast(true);
             socket.setSoTimeout(10);
             Resources res = ctx.getResources();
-            InputStream in_s = res.openRawResource(R.raw.lb100_status);
+            InputStream in_s = res.openRawResource(R.raw.lb130_status);
 
             byte[] b = new byte[in_s.available()];
             in_s.read(b);
@@ -111,10 +110,7 @@ public class Device {
     }
 
     public static String generateString() {
-        String deviceId = "";
-        WifiManager manager = (WifiManager) ((Context) ctx).getSystemService(Context.WIFI_SERVICE);
-        WifiInfo info = manager.getConnectionInfo();
-        return info.getMacAddress();
+        return  Settings.Secure.getString(ctx.getContentResolver(),  Settings.Secure.ANDROID_ID);
     }
 
     public static void sendInfos(DatagramPacket packet) throws IOException {
@@ -221,6 +217,7 @@ public class Device {
             try {
                 socket.receive(packet);
                 String json = tplink.decrypt(packet.getData());
+                System.out.println(json);
                 JSONObject obj = new JSONObject(json);
                 if(obj.has("system")) {
                     JSONObject instruct = obj.getJSONObject("system");
